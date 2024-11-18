@@ -17,11 +17,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Install dependencies and libraries
+      # Step 2: Install required tools, libraries, and Vulkan
       - name: Install required tools and dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential libepoxy-dev
+          sudo apt-get install -y \
+            cmake \
+            build-essential \
+            libepoxy-dev \
+            vulkan-tools \
+            vulkan-utils \
+            libvulkan-dev \
+            mesa-vulkan-drivers
 
       # Step 3: Configure and Build the project
       - name: Configure and Build
