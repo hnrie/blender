@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Install required tools and Vulkan dependencies
+      # Step 2: Install required tools, Vulkan, and shaderc
       - name: Install required tools and dependencies
         run: |
           sudo apt-get update
@@ -27,11 +27,15 @@ jobs:
             libepoxy-dev \
             vulkan-tools \
             libvulkan-dev \
-            mesa-vulkan-drivers
+            mesa-vulkan-drivers \
+            libshaderc-dev \
+            shaderc
 
-      # Step 3: Verify Vulkan installation (optional)
-      - name: Verify Vulkan installation
-        run: vulkaninfo || echo "vulkaninfo not available"
+      # Step 3: Verify Vulkan and Shaderc (Optional)
+      - name: Verify Vulkan and Shaderc installation
+        run: |
+          vulkaninfo || echo "vulkaninfo not available"
+          shaderc -h || echo "shaderc not available"
 
       # Step 4: Configure and Build the project
       - name: Configure and Build
