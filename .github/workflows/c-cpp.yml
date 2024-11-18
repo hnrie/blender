@@ -13,20 +13,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Install necessary build tools
-      - name: Install build tools
+      # Step 2: Install dependencies and libraries
+      - name: Install required tools and dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake build-essential
+          sudo apt-get install -y cmake build-essential libepoxy-dev
 
-      # Build the project
+      # Step 3: Configure and Build the project
       - name: Configure and Build
         run: |
           mkdir -p build
           cd build
           cmake ..
           make
+
+      # Step 4: Debugging (Optional) - Show CMakeCache.txt if errors persist
+      - name: Debug CMake Cache (Optional)
+        if: failure()
+        run: cat build/CMakeCache.txt
