@@ -13,24 +13,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout your code
+      # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up your programming environment (Node.js in this example)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
-      # Install dependencies
-      - name: Install dependencies
-        run: npm install
+      # Install necessary build tools
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential
 
       # Build the project
-      - name: Build the project
-        run: npm run build
-
-      # Run tests (optional)
-      - name: Run tests
-        run: npm test
+      - name: Configure and Build
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          make
