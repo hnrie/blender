@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Install required tools, libraries, and Vulkan
+      # Step 2: Install required tools and Vulkan dependencies
       - name: Install required tools and dependencies
         run: |
           sudo apt-get update
@@ -26,11 +26,14 @@ jobs:
             build-essential \
             libepoxy-dev \
             vulkan-tools \
-            vulkan-utils \
             libvulkan-dev \
             mesa-vulkan-drivers
 
-      # Step 3: Configure and Build the project
+      # Step 3: Verify Vulkan installation (optional)
+      - name: Verify Vulkan installation
+        run: vulkaninfo || echo "vulkaninfo not available"
+
+      # Step 4: Configure and Build the project
       - name: Configure and Build
         run: |
           mkdir -p build
@@ -38,7 +41,7 @@ jobs:
           cmake ..
           make
 
-      # Step 4: Debugging (Optional) - Show CMakeCache.txt if errors persist
+      # Step 5: Debugging (Optional) - Show CMakeCache.txt if errors persist
       - name: Debug CMake Cache (Optional)
         if: failure()
         run: cat build/CMakeCache.txt
