@@ -1,4 +1,4 @@
-name: Install and Compile Arch Linux with Keep-Alive
+name: Install and Compile on Arch Linux
 
 on:
   workflow_dispatch:
@@ -6,40 +6,23 @@ on:
 jobs:
   build-arch:
     runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
 
     steps:
-    # Step 1: Set up Arch Linux Container
-    - name: Start Arch Linux Container
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker.io
-        docker run --name arch-build -d -it archlinux:latest bash
-
-    # Step 2: Install Build Tools
-    - name: Install Build Tools
-      run: |
-        docker exec arch-build bash -c "
+      - name: Install Build Tools
+        run: |
           pacman -Sy --noconfirm base-devel git
-        "
 
-    # Step 3: Clone and Compile Project
-    - name: Clone and Compile Project
-      run: |
-        docker exec arch-build bash -c "
-          git clone https://github.com/example/project.git /build/project &&
-          cd /build/project &&
+      - name: Clone and Compile Project
+        run: |
+          git clone https://github.com/example/project.git /build/project
+          cd /build/project
           make
-        "
 
-    # Step 4: Leave Container Running
-    - name: Leave Container Running (Keep-Alive)
-      run: |
-        echo "Arch container is still running. Use the GitHub runner logs to monitor its status."
-        docker ps
-
-    # Optional Step: Manually Stop the Container
-    - name: Stop the Container (Optional)
-      if: ${{ github.event.inputs.stop_container == 'true' }}
-      run: |
-        docker stop arch-build
-        docker rm arch-build
+      # Uncomment and edit the following to upload a build artifact if needed
+      # - name: Upload build artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: build-output
+      #     path: /build/project/output/
