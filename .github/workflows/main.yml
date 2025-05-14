@@ -19,7 +19,9 @@ jobs:
             alembic openxr vulkan-icd-loader vulkan-headers \
             wayland-protocols wayland libxi libx11 libxcursor \
             libxrandr libxinerama libepoxy libpng libjpeg-turbo \
-            zlib libtiff potrace jemalloc openmp
+            zlib libtiff potrace jemalloc openmp opensubdiv \
+            libspnav fftw embree usd fontconfig harfbuzz \
+            xz lzma libxml2 hdf5 json-c
 
       - name: Clone Blender Source
         run: |
