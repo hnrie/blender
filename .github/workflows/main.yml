@@ -1,4 +1,4 @@
-name: Build Blender on Arch Linux
+name: Build Blender on Ubuntu with Docker
 
 on:
   workflow_dispatch:
@@ -6,40 +6,41 @@ on:
 jobs:
   build-blender:
     runs-on: ubuntu-latest
-    container:
-      image: archlinux:latest
 
     steps:
-      - name: Install Blender Build Dependencies
-        run: |
-          pacman -Sy --noconfirm git base-devel cmake ninja gcc \
-            python python-numpy python-requests python-setuptools \
-            boost eigen openimageio openvdb openexr openal ffmpeg \
-            opencolorio opengl glfw glew freetype tbb sdl2 \
-            alembic openxr vulkan-icd-loader vulkan-headers \
-            wayland-protocols wayland libxi libx11 libxcursor \
-            libxrandr libxinerama libepoxy libpng libjpeg-turbo \
-            zlib libtiff potrace jemalloc openmp opensubdiv \
-            libspnav fftw embree usd fontconfig harfbuzz \
-            xz lzma libxml2 hdf5 json-c
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
 
-      - name: Clone Blender Source
+      - name: Build Blender inside Ubuntu Docker container
         run: |
-          git clone --depth 1 https://github.com/blender/blender.git /blender
-          cd /blender
-          git submodule update --init --recursive
+          docker pull ubuntu:22.04
+          docker run --rm -v $PWD:/workspace -w /workspace ubuntu:22.04 bash -c "
+            apt-get update &&
+            DEBIAN_FRONTEND=noninteractive apt-get install -y \
+              git build-essential cmake ninja-build gcc g++ \
+              python3 python3-numpy python3-requests python3-setuptools \
+              libboost-all-dev libeigen3-dev libopenimageio-dev \
+              libopenvdb-dev libopenexr-dev libopenal-dev ffmpeg \
+              libopencolorio-dev libglfw3-dev libglew-dev libfreetype6-dev \
+              libtbb-dev libsdl2-dev libalembic-dev libopenxr-dev \
+              libvulkan-dev libwayland-dev libxi-dev libx11-dev \
+              libxcursor-dev libxrandr-dev libxinerama-dev libepoxy-dev \
+              libpng-dev libjpeg-dev zlib1g-dev libtiff-dev libjemalloc-dev \
+              libomp-dev libspnav-dev libfftw3-dev libembree-dev \
+              libusd-dev fontconfig libharfbuzz-dev xz-utils liblzma-dev \
+              libxml2-dev libhdf5-dev libjson-c-dev wget &&
+            git clone --depth 1 https://github.com/blender/blender.git /blender &&
+            cd /blender &&
+            git submodule update --init --recursive &&
+            mkdir build &&
+            cd build &&
+            cmake .. -G Ninja &&
+            ninja
+          "
 
-      - name: Build Blender
-        run: |
-          cd /blender
-          mkdir build
-          cd build
-          cmake .. -G Ninja
-          ninja
-
-      # Uncomment if you want to upload the built Blender binary
+      # Uncomment below to upload Blender binary as artifact
       # - name: Upload Blender Binary
       #   uses: actions/upload-artifact@v4
       #   with:
       #     name: blender-binary
-      #     path: /blender/build/bin/blender
+      #     path: blender/build/bin/blender
