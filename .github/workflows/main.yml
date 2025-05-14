@@ -1,0 +1,43 @@
+name: Build Blender on Arch Linux
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-blender:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+
+    steps:
+      - name: Install Blender Build Dependencies
+        run: |
+          pacman -Sy --noconfirm git base-devel cmake ninja gcc \
+            python python-numpy python-requests python-setuptools \
+            boost eigen openimageio openvdb openexr openal ffmpeg \
+            opencolorio opengl glfw glew freetype tbb sdl2 \
+            alembic openxr vulkan-icd-loader vulkan-headers \
+            wayland-protocols wayland libxi libx11 libxcursor \
+            libxrandr libxinerama libepoxy libpng libjpeg-turbo \
+            zlib libtiff potrace jemalloc openmp
+
+      - name: Clone Blender Source
+        run: |
+          git clone --depth 1 https://github.com/blender/blender.git /blender
+          cd /blender
+          git submodule update --init --recursive
+
+      - name: Build Blender
+        run: |
+          cd /blender
+          mkdir build
+          cd build
+          cmake .. -G Ninja
+          ninja
+
+      # Uncomment if you want to upload the built Blender binary
+      # - name: Upload Blender Binary
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: blender-binary
+      #     path: /blender/build/bin/blender
