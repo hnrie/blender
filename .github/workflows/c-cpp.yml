@@ -16,9 +16,9 @@ jobs:
 
       - name: Clone and Compile Project
         run: |
-          git clone https://github.com/example/project.git /build/project
+          git clone https://github.com/archlinux/svntogit-packages.git /build/project
           cd /build/project
-          make
+          makepkg -si --noconfirm
 
       # Uncomment and edit the following to upload a build artifact if needed
       # - name: Upload build artifact
